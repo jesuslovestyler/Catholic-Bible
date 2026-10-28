@@ -1,4 +1,4 @@
-/* World English Bible — feature data, loaded lazily by index.html
+/* Catholic Bible — feature data, loaded lazily by index.html
    through its script-tag loader (the loadTestament/loadXrefs pattern),
    so the app shell stays light. Content moved verbatim from index.html. */
 
@@ -117,25 +117,25 @@
         {
           id: "psalms",
           title: "Psalms in a Month",
-          desc: "Five psalms at a time through Israel's songbook.",
+          desc: "Five psalms at a time through Israel's songbook. Psalms are numbered as in the Douay-Rheims (Vulgate) tradition.",
           days: groupCapped(flatChapters([18]), 5)
         },
         {
           id: "nt90",
           title: "The New Testament in 90 Days",
-          desc: "From Matthew to Revelation, two or three chapters at a time.",
+          desc: "From Matthew to the Apocalypse, two or three chapters at a time.",
           days: groupEven(flatChapters(NT_BOOK_LIST), 90)
         },
         {
           id: "ot9",
           title: "The Old Testament in 9 Months",
-          desc: "Genesis through Malachi, in order — three or four chapters at a time.",
+          desc: "Genesis through Malachias, in order — three or four chapters at a time.",
           days: groupEven(flatChapters(OT_BOOK_LIST), 270)
         },
         {
           id: "year",
           title: "The Bible in a Year",
-          desc: "Genesis through Revelation, in order — three or four chapters at a time.",
+          desc: "Genesis through the Apocalypse, in order — three or four chapters at a time.",
           days: groupEven(flatChapters(ALL_BOOK_LIST), 365)
         }
       ];
