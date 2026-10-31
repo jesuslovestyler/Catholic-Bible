@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Catholic Bible" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="icon" href="data:," />
-    <meta name="app-build" content="202610281700" />
+    <meta name="app-build" content="202610311430" />
     <title>Catholic Bible</title>
     <meta name="description" content="The whole Catholic Bible, free to read and search — all 73 books, in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval." />
     <meta property="og:title" content="Catholic Bible" />
@@ -1486,7 +1486,7 @@
         </p>
 
         <footer class="site">Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval. Share freely.<br />Words of Jesus shown in red.</footer>
-        <p class="source-note">This is the Catholic Bible in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval — complete in all 73 books, translated from the Latin Vulgate, word for word as published by eBible.org (engDRA). The books stand under their Douay-Rheims names — Josue, 1–4 Kings, Paralipomenon, Esdras, Tobias, Ecclesiasticus, Isaias, Jeremias, Ezechiel, the Machabees, and the Apocalypse among them. The deuterocanonical books are Tobias, Judith, Wisdom, Ecclesiasticus, Baruch with the Epistle of Jeremiah as its sixth chapter, and 1–2 Machabees. Esther stands in its traditional Douay-Rheims form: the story through chapter 10, with the Greek additions gathered after it as chapters 11–16. Daniel holds the Prayer of Azarias and the Song of the Three Children in chapter 3, Susanna as chapter 13, and Bel and the Dragon as chapter 14. Psalms are numbered as in the Douay-Rheims (Vulgate) tradition, so their numbers can differ by one from many other Bibles — “The Lord ruleth me” is Psalm 22 here. Listen reads this same text aloud with your device’s voice. The chapter summaries, section headings, and other helps were written for this app and are not part of the Bible text; a help stands only on a chapter it still describes in this translation.</p>
+        <p class="source-note">This is the Catholic Bible in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval — complete in all 73 books, translated from the Latin Vulgate, word for word as published by eBible.org (engDRA). The books stand under their Douay-Rheims names — Josue, 1–4 Kings, Paralipomenon, Esdras, Tobias, Ecclesiasticus, Isaias, Jeremias, Ezechiel, the Machabees, and the Apocalypse among them. The deuterocanonical books are Tobias, Judith, Wisdom, Ecclesiasticus, Baruch with the Epistle of Jeremiah as its sixth chapter, and 1–2 Machabees. Esther stands in its traditional Douay-Rheims form: the story through chapter 10, with the Greek additions gathered after it as chapters 11–16. Daniel holds the Prayer of Azarias and the Song of the Three Children in chapter 3, Susanna as chapter 13, and Bel and the Dragon as chapter 14. Psalms are numbered as in the Douay-Rheims (Vulgate) tradition, so their numbers can differ by one from many other Bibles — “The Lord ruleth me” is Psalm 22 here. Listen reads this same text aloud with your device’s voice. The chapter summaries, section headings, and other helps were written for this app and are not part of the Bible text; a help stands only on a chapter it still describes in this translation. Cross references are drawn from two public-domain sources: the Treasury of Scripture Knowledge for the 66 books, and, for the deuterocanon books and added chapters, the marginal cross references of the original Douay-Rheims Bible (New Testament 1582, Old Testament 1609–1610), public domain.</p>
       </section>
 
       <!-- ============ CHAPTER GRID ============ -->
@@ -1839,10 +1839,6 @@
           <button class="btn saved-btn" id="words-btn" type="button">📚 Bible Words</button>
         </div>
         <div class="saved-box">
-          <a class="btn saved-btn download-link" id="study-original-btn" href="https://jesuslovestyler.github.io/Study-Bible/">📜 Study the Original Words</a>
-          <p class="explore-note">The entire Bible in its original words — an interlinear study Bible: every word of the Greek and Hebrew with its translation, definition, and synonyms — 66 books, 445,671 words. Tap any word to study it.</p>
-        </div>
-        <div class="saved-box">
           <a class="btn saved-btn download-link" id="study-catholic-original-btn" href="https://jesuslovestyler.github.io/Catholic-Study-Bible/">📜 Study the Catholic Bible's Original Words</a>
           <p class="explore-note">The Catholic Bible in its original words — an interlinear study Bible: every word of the Greek and Hebrew with its translation, definition, and synonyms — the 66 books plus the complete deuterocanon in Greek, 525,463 words. Tap any word to study it.</p>
         </div>
@@ -2117,7 +2113,10 @@
       /* ---- per-verse cross references: assets/xrefs.js sets
          window.__WEB_XREFS__, keyed "Book C:V" with each verse's
          reference labels in the data's own order (the Treasury of
-         Scripture Knowledge's). Loaded lazily through
+         Scripture Knowledge's for the 66 books, with the original
+         Douay-Rheims Bible's marginal cross references merged in
+         for the deuterocanon books and added chapters, and for
+         references in other books that point into them). Loaded lazily through
          the same script-tag path as the Bible text — the first time
          a chapter opens in the reader — so it never delays the home
          view, and the service worker's runtime caching keeps it
@@ -2565,12 +2564,23 @@
          selected — the nearest landing the reader's one-chapter
          deep links can make. */
       function parseVerseXref(label) {
-        var m = /^(.+?)\s+(\d+):(\d+)(.*)$/.exec(label);
-        if (!m) return null;
         function bookIndex(name) {
           if (name === "Psalm") name = "Psalms";
           for (var i = 0; i < META.length; i++) if (META[i][0] === name) return i;
           return -1;
+        }
+        var m = /^(.+?)\s+(\d+):(\d+)(.*)$/.exec(label);
+        if (!m) {
+          /* A chapter-only label ("Wisdom 10" — the shape the
+             original Douay-Rheims margins often take) opens its
+             chapter, the way the chapter-end references do. */
+          var cm = /^(.+?)\s+(\d+)$/.exec(label);
+          if (!cm) return null;
+          var cbi = bookIndex(cm[1]);
+          if (cbi < 0) return null;
+          var cchap = parseInt(cm[2], 10);
+          if (cchap < 1 || cchap > META[cbi][1]) return null;
+          return { b: cbi, c: cchap - 1, hl: 0 };
         }
         var bi = bookIndex(m[1]);
         if (bi < 0) return null;
