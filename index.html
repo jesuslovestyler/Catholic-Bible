@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Catholic Bible" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="icon" href="data:," />
-    <meta name="app-build" content="202611011657" />
+    <meta name="app-build" content="202611011746" />
     <title>Catholic Bible</title>
     <meta name="description" content="The whole Catholic Bible, free to read and search — all 73 books, in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval." />
     <meta property="og:title" content="Catholic Bible" />
@@ -9077,12 +9077,26 @@
       var searchIndex = null; /* [{b,c,v,low}] built once both testaments are in */
       function buildIndex() {
         searchIndex = [];
+        /* One entry per verse, by construction. This walk once
+           collected every deuterocanon verse twice: that text
+           reached the index from two sources at once, so each of
+           its hits was listed two times in the results while the
+           other books appeared once. A verse already indexed is
+           never added again — the first copy stands, in the order
+           it has always had, and any later copy of the same book,
+           chapter, and verse is dropped before it can be counted
+           or shown. */
+        var seen = {};
         for (var bi = 0; bi < META.length; bi++) {
           var bk = bookData(bi);
           if (!bk) continue;
           bk.c.forEach(function (chap, ci) {
             chap.split("\n").forEach(function (text, vi) {
-              if (text) searchIndex.push({ b: bi, c: ci, v: vi + 1, low: text.toLowerCase() });
+              if (!text) return;
+              var key = META[bi][0] + ":" + ci + ":" + (vi + 1);
+              if (seen[key]) return;
+              seen[key] = 1;
+              searchIndex.push({ b: bi, c: ci, v: vi + 1, low: text.toLowerCase() });
             });
           });
         }
@@ -9488,7 +9502,7 @@
          fetch (offline) shows a friendly no-connection line instead.
          Everything is wrapped so a check can never break offline
          reading or any other feature. */
-      var APP_BUILD_STAMP = "202611011657";
+      var APP_BUILD_STAMP = "202611011746";
       (function () {
         try {
           var btn = $("update-btn");
