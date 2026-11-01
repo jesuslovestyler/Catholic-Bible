@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Catholic Bible" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="icon" href="data:," />
-    <meta name="app-build" content="202610311430" />
+    <meta name="app-build" content="202611011555" />
     <title>Catholic Bible</title>
     <meta name="description" content="The whole Catholic Bible, free to read and search — all 73 books, in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval." />
     <meta property="og:title" content="Catholic Bible" />
@@ -475,6 +475,19 @@
         font-size: 15px; color: var(--accent); background: var(--surface);
         border: 1px solid var(--line); border-radius: 999px;
         padding: 8px 14px; min-height: 40px; box-shadow: var(--shadow);
+      }
+      /* our own cross references (see assets/own-xrefs.js): a second
+         group under the same "Cross references" heading, under its
+         own name, each chip carrying the kind of link it is. */
+      .sb-own-xrefs { margin-top: 12px; }
+      .sb-own-xrefs[hidden] { display: none; }
+      .xref-subhead {
+        font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+        text-transform: uppercase; color: var(--accent); margin: 0 0 8px;
+      }
+      .xref-kind {
+        font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em;
+        text-transform: uppercase; opacity: 0.75; margin-left: 7px;
       }
 
       .chapter-text .wj { color: var(--redletter); }
@@ -1486,7 +1499,7 @@
         </p>
 
         <footer class="site">Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval. Share freely.<br />Words of Jesus shown in red.</footer>
-        <p class="source-note">This is the Catholic Bible in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval — complete in all 73 books, translated from the Latin Vulgate, word for word as published by eBible.org (engDRA). The books stand under their Douay-Rheims names — Josue, 1–4 Kings, Paralipomenon, Esdras, Tobias, Ecclesiasticus, Isaias, Jeremias, Ezechiel, the Machabees, and the Apocalypse among them. The deuterocanonical books are Tobias, Judith, Wisdom, Ecclesiasticus, Baruch with the Epistle of Jeremiah as its sixth chapter, and 1–2 Machabees. Esther stands in its traditional Douay-Rheims form: the story through chapter 10, with the Greek additions gathered after it as chapters 11–16. Daniel holds the Prayer of Azarias and the Song of the Three Children in chapter 3, Susanna as chapter 13, and Bel and the Dragon as chapter 14. Psalms are numbered as in the Douay-Rheims (Vulgate) tradition, so their numbers can differ by one from many other Bibles — “The Lord ruleth me” is Psalm 22 here. Listen reads this same text aloud with your device’s voice. The chapter summaries, section headings, and other helps were written for this app and are not part of the Bible text; a help stands only on a chapter it still describes in this translation. Cross references are drawn from two public-domain sources: the Treasury of Scripture Knowledge for the 66 books, and, for the deuterocanon books and added chapters, the marginal cross references of the original Douay-Rheims Bible (New Testament 1582, Old Testament 1609–1610), public domain.</p>
+        <p class="source-note">This is the Catholic Bible in the Douay-Rheims Bible (Challoner revision), American Edition 1899 — public domain; the classic English Catholic translation, published with ecclesiastical approval — complete in all 73 books, translated from the Latin Vulgate, word for word as published by eBible.org (engDRA). The books stand under their Douay-Rheims names — Josue, 1–4 Kings, Paralipomenon, Esdras, Tobias, Ecclesiasticus, Isaias, Jeremias, Ezechiel, the Machabees, and the Apocalypse among them. The deuterocanonical books are Tobias, Judith, Wisdom, Ecclesiasticus, Baruch with the Epistle of Jeremiah as its sixth chapter, and 1–2 Machabees. Esther stands in its traditional Douay-Rheims form: the story through chapter 10, with the Greek additions gathered after it as chapters 11–16. Daniel holds the Prayer of Azarias and the Song of the Three Children in chapter 3, Susanna as chapter 13, and Bel and the Dragon as chapter 14. Psalms are numbered as in the Douay-Rheims (Vulgate) tradition, so their numbers can differ by one from many other Bibles — “The Lord ruleth me” is Psalm 22 here. Listen reads this same text aloud with your device’s voice. The chapter summaries, section headings, and other helps were written for this app and are not part of the Bible text; a help stands only on a chapter it still describes in this translation. Cross references come from three public-domain sources: the Treasury of Scripture Knowledge; the marginal cross references of the original Douay-Rheims Bible (1582–1610), which cover the deuterocanon books and added chapters; and our own cross references — public domain, built for this app and free for anyone to use — which appear under their own name, each marked with the kind of link it is: a quotation, an allusion, a parallel, or a shared theme.</p>
       </section>
 
       <!-- ============ CHAPTER GRID ============ -->
@@ -1973,6 +1986,14 @@
       <div class="sb-xrefs" id="sharebar-xrefs" hidden>
         <h3 class="xref-head">Cross references</h3>
         <div class="sb-xref-list" id="sharebar-xref-list"></div>
+        <!-- our own cross references (assets/own-xrefs.js): a third
+             source beside the Treasury of Scripture Knowledge and the
+             original Douay-Rheims margins above; filled by
+             refreshVerseXrefs, hidden when the verse has none -->
+        <div class="sb-own-xrefs" id="sharebar-own-xrefs" hidden>
+          <h4 class="xref-subhead">Our own cross references</h4>
+          <div class="sb-xref-list" id="sharebar-own-xref-list"></div>
+        </div>
       </div>
     </div>
     <!-- note editor for the current selection -->
@@ -2137,6 +2158,32 @@
           });
         }
         return xrefsPromise;
+      }
+
+      /* ---- our own cross references: assets/own-xrefs.js sets
+         window.__OWN_XREFS__, keyed "Book C:V" with each verse's
+         references as {t: target label, k: kind} — the
+         Catholic-Cross-References dataset, v1.0.0, public domain
+         (Unlicense), made for this app. A third source beside the
+         Treasury of Scripture Knowledge and the original
+         Douay-Rheims margins in xrefs.js: it adds to their lists
+         and never replaces them, and it is shown under its own
+         name with the kind of each link. Loaded lazily through the
+         same script-tag path, alongside xrefs.js; a failed load
+         resolves to nothing and the group simply does not appear. */
+      var ownXrefsPromise = null, ownXrefsSettled = false;
+      function loadOwnXrefs() {
+        if (window.__OWN_XREFS__) { ownXrefsSettled = true; return Promise.resolve(window.__OWN_XREFS__); }
+        if (!ownXrefsPromise) {
+          ownXrefsPromise = new Promise(function (resolve) {
+            var s = document.createElement("script");
+            s.src = "assets/own-xrefs.js";
+            s.onload = function () { ownXrefsSettled = true; resolve(window.__OWN_XREFS__ || null); };
+            s.onerror = function () { ownXrefsSettled = true; resolve(null); };
+            document.head.appendChild(s);
+          });
+        }
+        return ownXrefsPromise;
       }
 
       /* ---- lazy feature data: assets/helps.js, assets/intros.js,
@@ -2544,12 +2591,23 @@
          stand under the verse actions as chips in the data's own
          order, each opening its passage the way a deep
          link does — a verse or range lands with those verses
-         selected. No selection, several verses, or a verse with no
-         references: the section does not appear. Display only, like
-         the chapter-end blocks — never part of the Bible text and
-         never spoken by Listen. */
+         selected. Our own cross references (assets/own-xrefs.js)
+         stand below them as their own named group, each chip
+         carrying the kind of link. No selection, several verses, or
+         a verse with no references: the section does not appear.
+         Display only, like the chapter-end blocks — never part of
+         the Bible text and never spoken by Listen. */
       function verseXrefsFor(bi, ci, v) {
         var data = window.__WEB_XREFS__;
+        if (!data) return null;
+        var list = data[META[bi][0] + " " + (ci + 1) + ":" + v];
+        return (list && list.length) ? list : null;
+      }
+      /* Our own cross references for one verse (assets/own-xrefs.js):
+         a list of {t, k} — the target label and the kind of link —
+         or null when the verse carries none of ours. */
+      function ownXrefsFor(bi, ci, v) {
+        var data = window.__OWN_XREFS__;
         if (!data) return null;
         var list = data[META[bi][0] + " " + (ci + 1) + ":" + v];
         return (list && list.length) ? list : null;
@@ -2606,20 +2664,26 @@
         if (!box) return;
         var single = !!(selection && selection.verses.length === 1);
         var list = single ? verseXrefsFor(selection.b, selection.c, selection.verses[0]) : null;
-        if (!list) {
+        var ownList = single ? ownXrefsFor(selection.b, selection.c, selection.verses[0]) : null;
+        var ownBox = $("sharebar-own-xrefs");
+        if (!list && !ownList) {
           box.hidden = true;
+          if (ownBox) ownBox.hidden = true;
           document.body.classList.remove("share-xrefs-open");
-          /* One verse is selected but the data has not landed yet:
-             when it does, run this refresh once more for whatever
-             selection is standing then. */
+          /* One verse is selected but a data file has not landed
+             yet: when it does, run this refresh once more for
+             whatever selection is standing then. */
           if (single && !window.__WEB_XREFS__ && !xrefsSettled) {
             loadXrefs().then(function () { refreshVerseXrefs(); });
+          }
+          if (single && !window.__OWN_XREFS__ && !ownXrefsSettled) {
+            loadOwnXrefs().then(function () { refreshVerseXrefs(); });
           }
           return;
         }
         var wrap = $("sharebar-xref-list");
         wrap.textContent = "";
-        list.forEach(function (label) {
+        (list || []).forEach(function (label) {
           var chip = el("button", "xref-chip", label);
           chip.type = "button";
           var target = parseVerseXref(label);
@@ -2630,6 +2694,30 @@
           }
           wrap.appendChild(chip);
         });
+        /* Our own references stand as their own group under their
+           own name, each chip naming the kind of link it is; the
+           group appears only when this verse carries some of ours,
+           and the Treasury / Douay-Rheims margins group above is
+           drawn exactly as it always was. */
+        if (ownBox) {
+          var ownWrap = $("sharebar-own-xref-list");
+          ownWrap.textContent = "";
+          (ownList || []).forEach(function (ref) {
+            var chip = el("button", "xref-chip");
+            chip.type = "button";
+            chip.appendChild(document.createTextNode(ref.t));
+            chip.appendChild(el("span", "xref-kind", ref.k));
+            chip.setAttribute("aria-label", ref.t + " (" + ref.k + ")");
+            var target = parseVerseXref(ref.t);
+            if (target) {
+              chip.addEventListener("click", function () {
+                openChapter(target.b, target.c, target.hl);
+              });
+            }
+            ownWrap.appendChild(chip);
+          });
+          ownBox.hidden = !ownList;
+        }
         box.hidden = false;
         document.body.classList.add("share-xrefs-open");
       }
@@ -9400,7 +9488,7 @@
          fetch (offline) shows a friendly no-connection line instead.
          Everything is wrapped so a check can never break offline
          reading or any other feature. */
-      var APP_BUILD_STAMP = "202610281200";
+      var APP_BUILD_STAMP = "202611011555";
       (function () {
         try {
           var btn = $("update-btn");
